@@ -20,7 +20,7 @@ import java.util.List;
 public class FragmentFirst extends Fragment {
     private static final String EXTRA = "ARRAY";
     private final static int COMMON_SIZE = 100;
-    private int SavedSize;
+    private int savedSize;
     private MyDataAdapter mAdapter;
     private Button addButton;
     private RecyclerView recyclerView;
@@ -32,27 +32,28 @@ public class FragmentFirst extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(savedInstanceState != null) {
-            SavedSize = savedInstanceState.getInt(EXTRA);
+            savedSize = savedInstanceState.getInt(EXTRA);
         }
-        else
-            SavedSize= COMMON_SIZE;
+        else{
+            savedSize = COMMON_SIZE;
+        }
     }
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        navigator = MainActivity.getNavigator(); // new Navigator;
+        navigator = ((FragmentNavigator)getActivity()); // new Navigator;
         if(mAdapter == null)
             mAdapter = new MyDataAdapter();
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         recyclerView = view.findViewById(R.id.list);
-        int columns = getResources().getBoolean(R.bool.is_horizontal) ? 4 : 3;
+        int columns = getActivity().getResources().getInteger(R.integer.columnsNumber);
         recyclerView.setLayoutManager(new GridLayoutManager(view.getContext(), columns));
         recyclerView.setAdapter(mAdapter);
         addButton = view.findViewById(R.id.add_button);
         addButton.setOnClickListener(v -> mAdapter.addElement());
-        mAdapter.setData(SavedSize);
+        mAdapter.setData(savedSize);
         return view;
     }
 
@@ -67,7 +68,7 @@ public class FragmentFirst extends Fragment {
 
     public void onSaveInstanceState(@NonNull  Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(EXTRA, SavedSize);
+        outState.putInt(EXTRA, savedSize);
     }
 
     class MyDataAdapter extends RecyclerView.Adapter<MyViewHolder> {
@@ -100,13 +101,13 @@ public class FragmentFirst extends Fragment {
         void setData(int size) {
             for(int i = getItemCount() + 1; i <= size; i++)
                 mData.add(i);
-            SavedSize = size;
+            savedSize = size;
             notifyDataSetChanged();
         }
         void addElement() {
             int pos = getItemCount() + 1;
             mData.add(pos);
-            SavedSize++;
+            savedSize++;
             notifyItemInserted(pos);
         }
     }
